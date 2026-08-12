@@ -5,32 +5,34 @@
 
 class SBUS {
   public:
-    // Constructor: กำหนดพอร์ต Serial ที่จะใช้ (เช่น Serial1)
+    // Constructor: Define the Serial port to use (e.g., Serial1)
     SBUS(HardwareSerial& serial);
-    
-    // เริ่มต้นระบบคอมมูนิเคชันของ SBUS
+
+    // Start SBUS communication
+    void begin(uint8_t rxPin, uint8_t txPin, bool inv);
+    void begin(uint8_t rxPin, uint8_t txPin);
     void begin();
-    
-    // คอยดักอ่านและประมวลผลข้อมูล (ต้องเรียกใน loop() เสมอ)
+
+    // Read and process data (must always be called in loop()
     void update();
-    
-    // เรียกอ่านค่า PWM (1000-2000 us) ของแต่ละแชนเนลแบบอิสระ (ระบุเลขช่อง 1 - 10)
+
+    // Read the PWM value (1000-2000 us) of each channel independently (specify channel number 1 - 10)
     uint16_t getChannel(uint8_t channel);
-    
-    // เช็คสถานะความปลอดภัยสัญญาณหลุด
+
+    // Check for safety status of lost signal
     bool isFailsafe();
     bool isFrameLost();
 
-  private:
+    private:
     HardwareSerial& _serial;
     uint8_t _buffer[25];
     int _index;
-    
+
     uint16_t _channelsRaw[16];
-    uint16_t _channelsPWM[16];
-    bool _failSafe;
-    bool _frameLost;
-    
+    uint16_t _channelsPWM[16]; 
+    bool _failSafe; 
+    bool _frameLost; 
+
     void parseSBUS();
 };
 
