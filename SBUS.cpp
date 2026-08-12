@@ -2,15 +2,56 @@
 
 SBUS::SBUS(HardwareSerial& serial) : _serial(serial), _index(0), _failSafe(false), _frameLost(false) {
   memset(_channelsRaw, 0, sizeof(_channelsRaw));
-  // ตั้งค่า Default ตอนยังไม่มีสัญญาณให้สติ๊กอยู่ตรงกลาง (1500) ส่วนคันเร่งช่อง 3 ให้เป็นต่ำสุด (1000)
+  // Set the Default when there is no signal to stick in the middle (1500), and the throttle channel 3 to the lowest (1000).
   for (int i = 0; i < 16; i++) {
     _channelsPWM[i] = (i == 2) ? 1000 : 1500;
   }
 }
 
-void SBUS::begin() {
-  _serial.begin(100000, SERIAL_8E2);
+// Option 1: The Master Function (Handles target-specific features)
+void SBUS::begin(uint8_t rxPin, uint8_t txPin, bool inv) {
+  #if defined(ARDUINO_ARCH_ESP32)
+    // ESP32 supports custom pins and internal software inversion natively
+    _serial.begin(100000, SERIAL_8E2, rxPin, txPin, inv);
+
+  #elif defined(ARDUINO_ARCH_RP2040)
+    // Pico (RP2040) supports pin remapping, but does NOT support native inversion in begin()
+    // It will ignore the 'inv' flag (you will use your NPN transistor)
+    _serial.setRX(rxPin);
+    _serial.setTX(txPin);
+    _serial.begin(100000, SERIAL_8E2);
+
+  #else
+    // AVR (Mega 2560), Teensy, STM32, etc. 
+    // These boards have strict hardwired serial pins and do not accept pin parameters.
+    // They safely fallback to standard 2-argument initialization.
+    _serial.begin(100000, SERIAL_8E2);
+  #endif
 }
+
+// Option 2: Custom pins (Defaults to true/standard inversion where supported)
+void SBUS::begin(uint8_t rxPin, uint8_t txPin) {
+  begin(rxPin, txPin, false);
+}
+
+// Option 3: Parameterless (Completely automatic architecture/board defaults)
+void SBUS::begin() {
+  #if defined(ARDUINO_ARCH_ESP32)
+    // Your exact custom ESP32 board configuration
+    begin(4, 25, true); 
+
+  #elif defined(ARDUINO_ARCH_RP2040)
+    // Raspberry Pi Pico standard Serial1/Serial2 default pins
+    // For example, if using Serial1, it defaults to RX=1, TX=0
+    begin(1, 0, false); 
+
+  #else
+    // Mega 2560 / AVR fallback
+    // Since it ignores pins anyway, we pass placeholder 0s to trigger Option 1
+    begin(0, 0, false); 
+  #endif
+}
+
 
 void SBUS::update() {
   while (_serial.available() > 0) {
@@ -47,7 +88,7 @@ void SBUS::parseSBUS() {
   _frameLost = _buffer[23] & 0x04;
   _failSafe  = _buffer[23] & 0x08;
 
-  // แปลงช่วงสัญญาณ 309-1690 ของรีโมทจริงให้เป็น 1000-2000 us พอดีเป๊ะ
+  // Convert the signal range of a real remote (309-1690) to exactly 1000-2000 US.
   for (int i = 0; i < 10; i++) {
     _channelsPWM[i] = map(_channelsRaw[i], 309, 1690, 1000, 2000);
     if (_channelsPWM[i] < 1000) _channelsPWM[i] = 1000;
@@ -56,7 +97,7 @@ void SBUS::parseSBUS() {
 }
 
 uint16_t SBUS::getChannel(uint8_t channel) {
-  // บังคับให้อ่านได้เฉพาะช่อง 1 ถึง 10 (ดัดกลับเป็น Index 0-9 ของอาร์เรย์)
+  // Force reading to be limited to entries 1 through 10 (reverting to index 0-9 of the array).
   if (channel < 1 || channel > 10) return 1500; 
   return _channelsPWM[channel - 1];
 }
