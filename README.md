@@ -36,7 +36,6 @@ void loop() {
   uint16_t ch3 = sbus.getChannel(3);
 }
 ```
-```
 ### Define TX/RX pin's and signal inversion (ESP32)
 ```cpp
 #include <SBUS.h>
