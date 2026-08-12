@@ -3,9 +3,7 @@ Library for decoding SBUS signals from a receiver.
   
 It converts the raw values ​​(309-1690) into the standard range of 1000-2000 us for up to 10 channels.
 
-Hardware Serial only with support for ESP32, Pi-Pico and AVR's.
-
-
+Requires a supported Arduino board using Hardware Serial like ESP32, Pi-Pico, AVR (Mega 2560), Teensy, STM32, etc.
 
 ## How to use
 ### Generic
