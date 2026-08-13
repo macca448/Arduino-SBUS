@@ -38,7 +38,7 @@ void SBUS::begin(uint8_t rxPin, uint8_t txPin) {
 void SBUS::begin() {
   #if defined(ARDUINO_ARCH_ESP32)
     // Your exact custom ESP32 board configuration
-    begin(4, 25, true); 
+    begin(26, 27, true); 
 
   #elif defined(ARDUINO_ARCH_RP2040)
     // Raspberry Pi Pico standard Serial1/Serial2 default pins
