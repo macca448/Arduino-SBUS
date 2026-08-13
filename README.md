@@ -5,6 +5,17 @@ It converts the raw values ​​(309-1690) into the standard range of 1000-2000
 
 Requires a supported Arduino board using Hardware Serial like ESP32, Pi-Pico, AVR (Mega 2560), Teensy, STM32, etc.
 
+## Signal Inversion
+An ESP32 has signal inversion in it's setup but most will need to make this simple signal inverter to be able to read the SBUS data with their controller.
+
+As a bonus the inverter will do a level shift if your RX is 6V and your controller is 3V3 or 5V and remember connect all grounds together.
+
+</br>
+
+<p align="center">
+  <img src="assets/signal_inverter.jpg" alt="SBUS Signal Inverter">
+</p>
+
 ## How to use
 ### Generic
 ```cpp
