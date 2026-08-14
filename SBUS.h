@@ -6,7 +6,7 @@
 class SBUS {
   public:
     // Constructor: Define the Serial port to use (e.g., Serial1)
-    SBUS(HardwareSerial& serial);
+    SBUS(HardwareSerial& serial, uint8_t throttleChannel = 3, uint16_t thDefVal = 1000);
 
     // Start SBUS communication
     void begin(uint8_t rxPin, uint8_t txPin, bool inv);
