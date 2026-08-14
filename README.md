@@ -41,7 +41,7 @@ void loop() {
 SBUS sbus(Serial1);
 
 void setup() {
-  //By default this enables signal inversion for ESP32
+  //By default signal inversion is false for ESP32
   sbus.begin(/*rxPin*/ 12, /*txPin*/ 13); 
 }
 void loop() {
@@ -55,8 +55,7 @@ void loop() {
 SBUS sbus(Serial2);
 
 void setup() {
-  //By default this enables signal inversion for ESP32
-  sbus.begin(/*rxPin*/ 16, /*txPin*/ 17, /*inversion*/ false); 
+  sbus.begin(/*rxPin*/ 16, /*txPin*/ 17, /*inversion*/ true); 
 }
 void loop() {
   sbus.update();
@@ -75,7 +74,7 @@ void loop() {
 SBUS sbus(Serial1, THR_CH, THR_VAL);
 
 void setup() {
-  //By default this enables signal inversion for ESP32
+  //RX1_pin, TX1_pin, ESP32 Non-inverted 
   sbus.begin(RX1, TX1, false); 
 }
 void loop() {
