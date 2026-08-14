@@ -1,19 +1,23 @@
 #include "SBUS.h"
 
 //Remap ESP32 TX2 and RX2 to their V2.x pins
-#define TX2 17
-#define RX2 16
+#define TX2 		17
+#define RX2 		16
+#define THR_CH	1						//Spektrum Air Uses Channel 1 for throttle
+#define THR_DEF	1900				//Spektrum Default Throttle Off value
 
 // Create an SBUS object bound to the system's Serial2 port
-SBUS sbus(Serial2);
+//SBUS sbus(Serial1);								//Uses TH = CH3 and 1000us for ON defaults
+SBUS sbus(Serial2, THR_CH, THR_DEF);	//Redfefines Throttle channel and its default value
 
 unsigned long prevPrint = 0;
 
 void setup() {
 Serial.begin(115200);
 
-// Initialize the SBUS library using custon pins and no signal inversion on an ESp32
-sbus.begin(RX2, TX2, false);
+// Initialize the SBUS library using custon pins
+sbus.begin(RX2, TX2, false);	//Custom RX and TX pins plus inversion option for ESP32
+//sbus.begin();									//Must use Serial1 
 
 Serial.println("==========================================");
 Serial.println(" SBUS Named Channels Full Example ");
