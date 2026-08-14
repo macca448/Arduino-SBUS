@@ -1,10 +1,11 @@
 #include "SBUS.h"
 
-SBUS::SBUS(HardwareSerial& serial) : _serial(serial), _index(0), _failSafe(false), _frameLost(false) {
+SBUS::SBUS(HardwareSerial& serial, uint8_t throttleChannel, uint16_t thDefVal) : _serial(serial), _index(0), _failSafe(false), _frameLost(false) {
   memset(_channelsRaw, 0, sizeof(_channelsRaw));
   // Set the Default when there is no signal to stick in the middle (1500), and the throttle channel 3 to the lowest (1000).
+  uint8_t throttleIndex = throttleChannel - 1;
   for (int i = 0; i < 16; i++) {
-    _channelsPWM[i] = (i == 2) ? 1000 : 1500;
+    _channelsPWM[i] = (i == throttleIndex) ? thDefVal : 1500;
   }
 }
 
@@ -38,7 +39,7 @@ void SBUS::begin(uint8_t rxPin, uint8_t txPin) {
 void SBUS::begin() {
   #if defined(ARDUINO_ARCH_ESP32)
     // Your exact custom ESP32 board configuration
-    begin(26, 27, true); 
+    begin(4, 25, true); 
 
   #elif defined(ARDUINO_ARCH_RP2040)
     // Raspberry Pi Pico standard Serial1/Serial2 default pins
