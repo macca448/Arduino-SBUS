@@ -18,6 +18,10 @@ As a bonus the inverter will do a level shift if your RX is 6V and your controll
 
 ## How to use
 ### Generic
+### Defaults
+  1. Throttle channel = 3
+  2. Throttle default value = 1000μs
+  3. Hardware Serial1 TX and RX pins
 ```cpp
 #include <SBUS.h>
 SBUS sbus(Serial1);
@@ -57,5 +61,25 @@ void setup() {
 void loop() {
   sbus.update();
   uint16_t ch3 = sbus.getChannel(3);
+}
+```
+### All options
+```cpp
+#include <SBUS.h>
+
+#define TX1 27
+#define RX1 26
+#define THR_CH 1      //Spektrum Air TX
+#define THR_VAL 1900  //Spektrum Throttle Off (Not Reversed)
+
+SBUS sbus(Serial1, THR_CH, THR_VAL);
+
+void setup() {
+  //By default this enables signal inversion for ESP32
+  sbus.begin(RX1, TX1, false); 
+}
+void loop() {
+  sbus.update();
+  uint16_t ch3 = sbus.getChannel(1);
 }
 ```
